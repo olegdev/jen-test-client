@@ -1,0 +1,10 @@
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.VideoCard {
+  border:  1px solid;
+  padding: 10px;
+  min-height: 200px;
+}
