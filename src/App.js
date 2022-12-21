@@ -19,7 +19,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <button onClick={this.handleAddComponentClick.bind(this)}>Add another card</button>
-        <div class="card-list">
+        <div className="card-list">
           {Array.from({ length: this.state.componentsCount }, (_, i) => <MakeVideoCard key={i}/>)}
         </div>
       </div>
