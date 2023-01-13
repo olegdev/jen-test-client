@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 const { REACT_APP_API_URL } = process.env
 
-function VideoFetcher({ renderId, onCancel }) {
+function VideoFetcher({ renderId, onComplete, onCancel }) {
   const [cancelClicked, setCancelClicked] = useState(false)
   const [renderState, setRenderState] = useState(null)
 
@@ -11,12 +11,14 @@ function VideoFetcher({ renderId, onCancel }) {
       const resp = await fetch(`${REACT_APP_API_URL}/renderVideo/${renderId}`)
       const data = await resp.json()
       setRenderState(data)
+      if (data.state === 'completed') {
+        onComplete()
+      }
+      if (data.state === 'completed' || data.state === 'failed') {
+        clearInterval(intervalId)
+      }
     }
     const intervalId = setInterval(() => {
-      if (renderState && (renderState.state === 'completed' || renderState.state === 'failed')) {
-        clearInterval(intervalId)
-        return
-      }
       requestRenderState()
     }, 3000)
     return () => clearInterval(intervalId)
@@ -48,7 +50,7 @@ function VideoFetcher({ renderId, onCancel }) {
           Real state: { renderState ? renderState.state : 'unknown' }
         </div>
         {renderState && renderState.state === 'completed' && <div>
-          <video src={renderState.result} controls loop autoplay />
+          <video src={renderState.result} controls loop muted type="video\/mp4" />
         </div>}
         <div>
           <button onClick={() => setCancelClicked(true)}>Cancel</button>
