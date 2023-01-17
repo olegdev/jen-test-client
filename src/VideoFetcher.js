@@ -50,7 +50,7 @@ function VideoFetcher({ renderId, onComplete, onCancel }) {
           Real state: { renderState ? renderState.state : 'unknown' }
         </div>
         {renderState && renderState.state === 'completed' && <div>
-          <video src={renderState.result} controls loop muted type="video\/mp4" />
+          <video src={renderState.result.replace('ipfs://','https://digitalpaint.mypinata.cloud/ipfs/')} controls loop muted type="video\/mp4" />
         </div>}
         <div>
           <button onClick={() => setCancelClicked(true)}>Cancel</button>

@@ -14,3 +14,13 @@
   margin-bottom: 3px;
   min-height: 200px;
 }
+
+.VideoCard .input-row {
+  display: flex;
+  align-items: flex-start;
+}
+.VideoCard .input-row textarea {
+  flex: 1;
+  max-width: 400px;
+  min-height: 100px;
+}
