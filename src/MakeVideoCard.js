@@ -10,13 +10,16 @@ function VideoCard() {
   const [cData, setCData] = useState(testCData)
   const [renderId, setRenderId] = useState(null)
   const [startEndTimes, setStartEndTimes] = useState([])
+  const [completed, setCompleted] = useState(false)
+  const [voucher, setVoucher] = useState(null)
   const [requestClicked, setRequestClicked] = useState(false)
+  const [createVoucherClicked, setCreateVoucherClicked] = useState(false)
+  const [cancelClicked, setCancelClicked] = useState(false)
 
   useEffect(() => {
     if (!requestClicked) {
       return
     }
-
     async function requestRender() {
       const resp = await fetch(`${REACT_APP_API_URL}/renderVideo`, {
         method: 'POST',
@@ -34,6 +37,46 @@ function VideoCard() {
     setRequestClicked(false)
   }, [requestClicked])
 
+  useEffect(() => {
+    if (!completed) {
+      return
+    }
+    setStartEndTimes([ startEndTimes[0], Date.now() ])
+  }, [completed])
+
+  useEffect(() => {
+    if (!cancelClicked) {
+      return
+    }
+    setRenderId(null)
+    setCompleted(false)
+    setVoucher(null)
+    setCancelClicked(false)
+  }, [cancelClicked])
+
+  useEffect(() => {
+    if (!createVoucherClicked) {
+      return
+    }
+    async function createVoucherRequest() {
+      const resp = await fetch(`${REACT_APP_API_URL}/voucher`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          renderId,
+          creator: '0x200f2Ae7942F27A6cA47729D665803d42Cec31A4'
+        })
+      })
+      const data = await resp.json()
+      setVoucher(data.voucher)
+    }
+    createVoucherRequest()
+    setCreateVoucherClicked(false)    
+  }, [createVoucherClicked, renderId])
+
   return (
       <div className="VideoCard">
         <div className="input-row">
@@ -46,11 +89,20 @@ function VideoCard() {
         {!!renderId &&
             <VideoFetcher
               renderId={renderId}
-              onComplete={() => setStartEndTimes([ startEndTimes[0], Date.now() ]) }
-              onCancel={() => setRenderId(null) }/>
+              onComplete={() => setCompleted(true) }
+              onCancel={() => setCancelClicked(true) }/>
         }
         
         { startEndTimes.length === 2 && <div> Complete time: { parseInt((startEndTimes[1] - startEndTimes[0])/1000 ) } sec </div> }
+
+        { completed && <button onClick={() => setCreateVoucherClicked(true) }>Get voucher</button> }
+
+        { voucher && (
+          <a target="_blank" href={voucher.tokenURI.replace('ipfs://', 'https://digitalpaint.mypinata.cloud/ipfs/')}>
+            {voucher.tokenURI}
+          </a>
+        )}
+
       </div>
   )
 }
